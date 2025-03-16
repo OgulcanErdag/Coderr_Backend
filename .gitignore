@@ -1,0 +1,31 @@
+# Virtuelle Umgebung ignorieren
+env/
+venv/
+
+# Bytecode-Dateien ignorieren
+__pycache__/
+*.pyc
+*.pyo
+
+# Datenbanken und Logs ignorieren
+db.sqlite3
+*.db
+*.sqlite3
+*.log
+
+# VS Code und PyCharm Projektdateien ignorieren
+.vscode/
+.idea/
+
+# Cache- und temporäre Dateien ignorieren
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Medien- und Statische Dateien ignorieren
+media/
+staticfiles/
+
+# .env-Datei ignorieren (für SECRET_KEY usw.)
+.env
