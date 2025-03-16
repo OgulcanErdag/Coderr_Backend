@@ -37,7 +37,7 @@
 ### Local Setup
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-user/coderr-backend.git
+git clone https://github.com/OgulcanErdag/Coderr_Backend.git
 cd coderr-backend
 
 # 2. Create virtual environment
