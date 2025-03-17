@@ -40,7 +40,6 @@ class OfferListView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
 class OfferDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -61,7 +60,6 @@ class OfferDetailView(APIView):
         offer = get_object_or_404(Offer, pk=pk)
         offer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 class OfferTypeDetailView(APIView):
     permission_classes = [AllowAny]
 

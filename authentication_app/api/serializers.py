@@ -44,7 +44,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 print(f"UserProfile für {user.username} existiert bereits.")
         return user
 
-    
 class UserProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source="user.id", read_only=True)
     username = serializers.CharField(source="user.username", read_only=True)

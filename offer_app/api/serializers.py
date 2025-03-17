@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from offer_app.models import Offer, OfferDetail
 
-
 class OfferDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetail
@@ -28,7 +27,6 @@ class OfferDetailSerializer(serializers.ModelSerializer):
         if price is not None and price <= 0:
             errors["price"] = ["Preis muss hoher als 1 sein."]
         return errors
-
 class OfferSerializer(serializers.ModelSerializer):
     details = OfferDetailSerializer(many=True, required=False)
     min_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
@@ -70,8 +68,6 @@ class OfferSerializer(serializers.ModelSerializer):
                 detail_data.pop('offer', None)
                 OfferDetail.objects.create(offer=offer, **detail_data)
         return offer
-    
-
 class OfferTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetail
