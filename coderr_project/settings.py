@@ -31,13 +31,13 @@ DEBUG = os.getenv("DEBUG") == "True"
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ogulcan-erdag.developerakademie.net']
 
+# Datenbankkonfiguration zurück auf Django-Standard
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / os.getenv("SQLITE_PATH", "db.sqlite3"),
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
-
 # Application definition
 
 INSTALLED_APPS = [
