@@ -40,13 +40,13 @@ class OfferSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
     def create(self, validated_data):
-        
         details_data = validated_data.pop('details', [])
-        request = self.context.get('request')  
-        user = request.user  
-        offer = Offer.objects.create(user=user, **validated_data)
+        validated_data['user'] = self.context['request'].user 
+        offer = Offer.objects.create(**validated_data)
+    
         for detail_data in details_data:
             OfferDetail.objects.create(offer=offer, **detail_data)
+
         return offer
 
     def validate(self, data):
