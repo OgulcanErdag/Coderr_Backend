@@ -63,6 +63,8 @@ class OfferDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class OfferTypeDetailView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request, pk, format=None):
         offer_detail = get_object_or_404(OfferDetail, pk=pk)
         serializer = OfferTypeSerializer(offer_detail)

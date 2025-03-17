@@ -21,7 +21,8 @@ class ReviewUpdateTestCase(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         
-        self.url = reverse("review-update", kwargs={"pk": self.review.id})
+        self.url = reverse("review-details", kwargs={"pk": self.review.id})
+
 
     def test_reviewer_can_update_review(self):
         payload = {

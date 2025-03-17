@@ -13,28 +13,47 @@ class OfferPatchTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         self.offer = Offer.objects.create(user=self.user, title="Altes Angebot", description="Altbeschreibung")
-        self.detail = OfferDetail.objects.create(offer=self.offer, title="Alt", price=100, revisions=1, delivery_time=5, features=["Logo"], offer_type="basic")
-        self.url = reverse("offer-update", kwargs={"pk": self.offer.pk})
+        self.detail = OfferDetail.objects.create(offer=self.offer, title="Alt", price=100, revisions=1, delivery_time_in_days=5, features=["Logo"], offer_type="basic")
+        self.url = reverse("offer-detail", kwargs={"pk": self.offer.pk})
 
     def test_creator_can_patch_offer(self):
         payload = {
             "title": "Neues Angebot",
             "details": [
-                {
-                    "id": self.detail.id,  # Achte darauf, dass die ID des Details hier korrekt übergeben wird
-                    "title": "Neues Detail",
-                    "revisions": 2,
-                    "delivery_time_in_days": 4,
-                    "price": 150,
-                    "features": ["Logo", "Flyer"],
-                    "offer_type": "basic"
-                }
-            ]
+        {
+            "title": "Neues Detail Basic",
+            "revisions": 2,
+            "delivery_time_in_days": 4,
+            "price": 150,
+            "features": ["Logo", "Flyer"],
+            "offer_type": "basic"
+        },
+        {
+            "title": "Neues Detail Standard",
+            "revisions": 3,
+            "delivery_time_in_days": 3,
+            "price": 200,
+            "features": ["Logo", "Visitenkarte"],
+            "offer_type": "standard"
+        },
+        {
+            "title": "Neues Detail Premium",
+            "revisions": -1,
+            "delivery_time_in_days": 2,
+            "price": 300,
+            "features": ["Alles", "Spezial"],
+            "offer_type": "premium"
         }
+    ]
+}
+
 
         response = self.client.patch(self.url, payload, format="json")
-        print(response.data)  # Für zusätzliche Debugging-Informationen
+        print(response.data)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["title"], "Neues Angebot")
-        self.assertEqual(response.data["details"][0]["title"], "Neues Detail")
+        self.assertEqual(len(response.data["details"]), 3)
+        self.assertEqual(response.data["details"][0]["offer_type"], "basic")
+        self.assertEqual(response.data["details"][1]["offer_type"], "standard")
+        self.assertEqual(response.data["details"][2]["offer_type"], "premium")
