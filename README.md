@@ -115,8 +115,8 @@ This project uses a `.env` file to manage environment-specific and sensitive set
 - `DEBUG`
 - Database paths and other credentials
 
-The `.env` file is excluded from version control (`.gitignore`), but a `.env.example` is provided as a template.  
-Please copy `.env.example` to `.env` and fill in your own values before running the project.
+The `.env` file is excluded from version control (`.gitignore`), but a `.env.template` is provided as a template.  
+Please copy `.env.template` to `.env` and fill in your own values before running the project.
 
 ---
 

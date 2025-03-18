@@ -2,10 +2,10 @@ from django.db.models import QuerySet
 
 class OrderingHelperOffers:
     ORDERING_OPTIONS = {
-        "newest": "-created_at",
-        "oldest": "created_at",
-        "cheapest": "min_price",
-        "expensive": "-min_price",
+        "-updated_at": "-updated_at",
+        "updated_at": "updated_at",
+        "-min_price": "-min_price",
+        "min_price": "min_price",
     }
 
     @staticmethod
