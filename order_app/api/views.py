@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.generics import ListAPIView, ListCreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
@@ -9,18 +10,17 @@ from .serializers import OrderSerializer, OrderCreateSerializer, OrderStatusUpda
 from authentication_app.models import UserProfile
 from rest_framework.exceptions import PermissionDenied
 from django.db.models import Q
-
 class OrderListView(ListAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
         return Order.objects.filter(Q(customer_user=user) | Q(business_user=user))
-
 class OrderListCreateView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
-
+   
     def get_serializer_class(self):
         if self.request.method == "POST":
             return OrderCreateSerializer
@@ -38,7 +38,6 @@ class OrderListCreateView(ListCreateAPIView):
         if profile.type != "customer":
             raise PermissionDenied("Nur Kunden können Bestellungen erstellen.")
         serializer.save()
-
 class OrderStatusUpdateView(UpdateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderStatusUpdateSerializer
@@ -54,10 +53,17 @@ class OrderStatusUpdateView(UpdateAPIView):
             raise PermissionDenied("Nur Business-User dürfen den Bestellstatus aktualisieren.")
         return order
     
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+    
+        full_data = OrderSerializer(instance, context={"request": request}).data
+        return Response(full_data, status=status.HTTP_200_OK)
 class OrderDeleteView(DestroyAPIView):
     queryset = Order.objects.all()
     permission_classes = [IsAdminUser]
-
 class OrderCountView(APIView):
     permission_classes = [AllowAny]
 
@@ -68,8 +74,7 @@ class OrderCountView(APIView):
             return Response({"detail": "Kein Geschäftsnutzer mit der angegebenen ID gefunden."}, status=404)
         
         order_count = Order.objects.filter(business_user=business_user, status="in_progress").count()
-        return Response({"order_count": order_count}, status=200)
-    
+        return Response({"order_count": order_count}, status=200)  
 class CompletedOrderCountView(APIView):
     permission_classes = [AllowAny]
 

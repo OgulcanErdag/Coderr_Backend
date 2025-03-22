@@ -6,10 +6,8 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
-
 class OrderCreateSerializer(serializers.ModelSerializer):
     offer_detail_id = serializers.IntegerField(write_only=True)
-
     class Meta:
         model = Order
         fields = ["offer_detail_id"]
@@ -30,7 +28,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         order = Order.objects.create(
             customer_user=customer_user,
             business_user=business_user,
-            title=offer_detail.title,
+            title=offer.title,
             revisions=revisions,
             delivery_time_in_days=offer_detail.delivery_time_in_days,
             price=offer_detail.price,
@@ -42,7 +40,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return OrderSerializer(instance, context=self.context).data
-
 class OrderStatusUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order

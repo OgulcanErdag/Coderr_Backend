@@ -7,12 +7,14 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from authentication_app.models import UserProfile
 from .serializers import UserProfileSerializer
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from review_app.models import Review
 from authentication_app.models import UserProfile
 from offer_app.models import Offer 
 from django.db.models import Avg
+import logging
 
+logger = logging.getLogger(__name__)
 class RegistrationView(APIView):
     permission_classes = [AllowAny]
 
@@ -30,7 +32,6 @@ class RegistrationView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-   
 class LoginView(APIView):
     permission_classes = [AllowAny] 
 
@@ -44,20 +45,26 @@ class LoginView(APIView):
                 "username": user.username,
                 "email": user.email,
                 "user_id": user.id
-            }, status=status.HTTP_201_CREATED)
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 class UserProfileDetailView(RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated]
     
     def get_object(self):
-        user_id = self.kwargs['pk']
+        user_id = self.kwargs.get('pk')
         try:
-            return UserProfile.objects.get(user__id=user_id)  
+            profile = UserProfile.objects.get(user__id=user_id)
         except UserProfile.DoesNotExist:
             raise NotFound("Kein passendes Profil gefunden.")
+        except Exception as e:
+            raise PermissionDenied(f"Fehler: {str(e)}")
 
+        if self.request.method in ['PUT', 'PATCH']:
+            if self.request.user.id != profile.user.id:
+                raise PermissionDenied("Du darfst nur dein eigenes Profil bearbeiten.")
+
+        return profile
 class BaseInfoView(APIView):
     permission_classes = [AllowAny]  
 
@@ -74,20 +81,21 @@ class BaseInfoView(APIView):
             "business_profile_count": business_profile_count,
             "offer_count": offer_count,
         }
-        return Response(data)
-    
+        return Response(data)   
 class BusinessProfileListView(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = None
 
     def get(self, request):
         business_profiles = UserProfile.objects.filter(type="business")
         serializer = UserProfileSerializer(business_profiles, many=True)
-        return Response(serializer.data)
-    
+        return Response(serializer.data)  
 class CustomerProfileListView(APIView):
     permission_classes = [IsAuthenticated]
-
+    pagination_class = None
+    
     def get(self, request):
         customer_profiles = UserProfile.objects.filter(type="customer")
         serializer = UserProfileSerializer(customer_profiles, many=True)
         return Response(serializer.data)
+    

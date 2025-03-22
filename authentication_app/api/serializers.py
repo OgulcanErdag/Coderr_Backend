@@ -10,11 +10,9 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from authentication_app.models import UserProfile
 from rest_framework.authtoken.models import Token
-
 class RegistrationSerializer(serializers.ModelSerializer):
     repeated_password = serializers.CharField(write_only=True)
     type = serializers.ChoiceField(choices=[('customer', 'Customer'), ('business', 'Business')])
-
     class Meta:
         model = User
         fields = ['username', 'email', 'password', 'repeated_password', 'type']
@@ -43,7 +41,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
             else:
                 print(f"UserProfile für {user.username} existiert bereits.")
         return user
-
 class UserProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source="user.id", read_only=True)
     username = serializers.CharField(source="user.username", read_only=True)
@@ -62,11 +59,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.user.save()
         instance.save()
         return instance
-
     class Meta:
         model = UserProfile
         fields = '__all__'
-
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)

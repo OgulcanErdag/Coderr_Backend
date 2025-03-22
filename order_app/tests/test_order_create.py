@@ -6,6 +6,7 @@ from offer_app.models import Offer, OfferDetail
 from authentication_app.models import UserProfile
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from decimal import Decimal
 
 class OrderCreateTestCase(APITestCase):
     def setUp(self):
@@ -41,3 +42,8 @@ class OrderCreateTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["title"], self.offer_detail.title)
         self.assertEqual(response.data["status"], "in_progress")
+        self.assertEqual(Decimal(response.data["price"]), Decimal(self.offer_detail.price))
+        self.assertEqual(response.data["revisions"], self.offer_detail.revisions)
+        self.assertEqual(response.data["offer_type"], self.offer_detail.offer_type)
+        self.assertEqual(response.data["customer_user"], self.customer.id)
+        self.assertEqual(response.data["business_user"], self.business.id)

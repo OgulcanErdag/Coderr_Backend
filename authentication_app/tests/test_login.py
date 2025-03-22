@@ -24,7 +24,7 @@ class LoginTestCase(APITestCase):
 
         response = self.client.post(url, payload, format="json")
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["token"], self.token.key)
         self.assertEqual(response.data["username"], self.user.username)
         self.assertEqual(response.data["email"], self.user.email)

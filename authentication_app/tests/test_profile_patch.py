@@ -40,6 +40,6 @@ class UserProfilePatchTestCase(APITestCase):
         }
 
         response = self.client.patch(url, payload, format="json")
-    
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["location"], "Hacked City")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("detail", response.data)  

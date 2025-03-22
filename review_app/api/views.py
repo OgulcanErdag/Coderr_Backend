@@ -5,21 +5,14 @@ from .serializers import ReviewSerializer
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from order_app.models import Order
-
 class ReviewListView(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['business_user_id', 'reviewer_id']
     ordering_fields = ['updated_at', 'rating']
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     pagination_class = None
-
-    def get_permissions(self):
-       
-        if self.request.method == 'POST':
-            return [permissions.IsAuthenticated()]
-        return super().get_permissions()
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -32,17 +25,11 @@ class ReviewListView(generics.ListCreateAPIView):
         if not business_user:
             raise PermissionDenied("Kein Anbieter angegeben.")
 
-        has_completed_order = Order.objects.filter(
-            customer_user=user,
-            business_user_id=business_user,
-            status="completed"
-        ).exists()
+        has_completed_order = Order.objects.filter(customer_user=user,business_user_id=business_user,status="completed").exists()
 
         if not has_completed_order:
             raise PermissionDenied("Du kannst nur bewerten, wenn du eine abgeschlossene Bestellung bei diesem Anbieter hast.")
-
         serializer.save(reviewer=user)
-
 class ReviewDetailsView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
