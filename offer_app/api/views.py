@@ -24,8 +24,9 @@ class OfferListView(ListCreateAPIView):
 
     def get_queryset(self):
         params = self.request.query_params
+        offers = Offer.objects.all()
 
-        offers = Offer.objects.annotate(
+        offers = offers.annotate(
             min_price=Min('details__price'),
             min_delivery_time=Min('details__delivery_time_in_days')
         )
@@ -37,19 +38,19 @@ class OfferListView(ListCreateAPIView):
             offers = offers.filter(
                 Q(title__icontains=search) | Q(description__icontains=search)
             )
-
+        
         if (max_delivery_time := params.get('max_delivery_time')):
             try:
                 offers = offers.filter(details__delivery_time_in_days__lte=int(max_delivery_time))
             except ValueError:
                 raise ValidationError({"max_delivery_time": "Muss eine ganze Zahl sein."})
-
-        if (min_price_offer := params.get('min_price_offer')):
+            
+        if (min_price := params.get('min_price')):
             try:
-                offers = offers.filter(min_price__gte=float(min_price_offer))
+                offers = offers.filter(min_price__gte=float(min_price))
             except ValueError:
-                raise ValidationError({"min_price_offer": "Muss eine Zahl sein."})
-
+                raise ValidationError({"min_price": "Muss eine Zahl sein."})
+            
         ordering = params.get('ordering')
         offers = OrderingHelperOffers.apply_ordering(offers, ordering)
 
@@ -83,18 +84,27 @@ class OfferDetailView(APIView):
 
     def patch(self, request, pk, format=None):
         offer = get_object_or_404(Offer, pk=pk)
+
+        if offer.user != request.user:
+            raise PermissionDenied("Nur der Ersteller darf dieses Angebot ändern.")
+
         serializer = OfferSerializer(offer, data=request.data, partial=True, context={'request': request})
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+    
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         offer = get_object_or_404(Offer, pk=pk)
+        if offer.user != request.user:
+            raise PermissionDenied("Nur der Ersteller darf dieses Angebot löschen.")
+
         offer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 class OfferTypeDetailView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, format=None):
         offer_detail = get_object_or_404(OfferDetail, pk=pk)

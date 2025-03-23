@@ -3,6 +3,7 @@ from order_app.models import Order
 from offer_app.models import OfferDetail
 
 class OrderSerializer(serializers.ModelSerializer):
+    price = serializers.FloatField()
     class Meta:
         model = Order
         fields = [
@@ -10,6 +11,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "customer_user",
             "business_user",
             "title",
+            "revisions",    
             "delivery_time_in_days",
             "price",
             "features",
@@ -41,7 +43,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             customer_user=customer_user,
             business_user=business_user,
             title=offer.title,
-            revisions=revisions,
+            revisions=offer_detail.revisions,
             delivery_time_in_days=offer_detail.delivery_time_in_days,
             price=offer_detail.price,
             features=offer_detail.features,
@@ -55,6 +57,19 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 class OrderStatusUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ["status"]
+        fields = [
+            "id",
+            "customer_user",
+            "business_user",
+            "title",
+            "revisions",
+            "delivery_time_in_days",
+            "price",
+            "features",
+            "offer_type",
+            "status",
+            "created_at",
+            "updated_at"
+        ]
 
         

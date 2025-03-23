@@ -28,7 +28,7 @@ class OfferDetailSerializer(serializers.ModelSerializer):
             errors["price"] = ["Preis muss höher als 1 sein."]
         return errors
 class OfferSerializer(serializers.ModelSerializer):
-    min_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    min_price = serializers.FloatField(read_only=True)
     min_delivery_time = serializers.IntegerField(read_only=True)
     details = serializers.SerializerMethodField()
     class Meta:
@@ -94,4 +94,12 @@ class OfferSerializer(serializers.ModelSerializer):
 class OfferTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetail
-        fields = '__all__'
+        fields = [
+            "id",
+            "title",
+            "revisions",
+            "delivery_time_in_days",
+            "price",
+            "features",
+            "offer_type"
+        ]
