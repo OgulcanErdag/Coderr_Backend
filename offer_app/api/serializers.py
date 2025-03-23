@@ -37,14 +37,19 @@ class OfferSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
     def get_details(self, obj):
-        request = self.context.get('request')
         return [
             {
                 "id": detail.id,
-                "url": request.build_absolute_uri(f"/api/offerdetails/{detail.id}/") if request else f"/api/offerdetails/{detail.id}/"
+                "title": detail.title,
+                "revisions": detail.revisions,
+                "delivery_time_in_days": detail.delivery_time_in_days,
+                "price": detail.price,
+                "features": detail.features or [],
+                "offer_type": detail.offer_type,
             }
             for detail in obj.details.all()
         ]
+
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -85,6 +90,7 @@ class OfferSerializer(serializers.ModelSerializer):
                 OfferDetail.objects.create(offer=offer, **detail_data)
 
         return offer
+
 class OfferTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetail

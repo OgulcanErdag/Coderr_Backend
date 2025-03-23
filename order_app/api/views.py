@@ -20,7 +20,8 @@ class OrderListView(ListAPIView):
         return Order.objects.filter(Q(customer_user=user) | Q(business_user=user))
 class OrderListCreateView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
-   
+    pagination_class = None
+    
     def get_serializer_class(self):
         if self.request.method == "POST":
             return OrderCreateSerializer
