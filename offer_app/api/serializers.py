@@ -46,6 +46,7 @@ class OfferSerializer(serializers.ModelSerializer):
                 "price": detail.price,
                 "features": detail.features or [],
                 "offer_type": detail.offer_type,
+                "url": f"/offerdetails/{detail.id}/" 
             }
             for detail in obj.details.all()
         ]
@@ -77,6 +78,15 @@ class OfferSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "non_field_errors": ["Details must include exactly one of each: basic, standard, premium."]
                 })
+            
+        if method == "PATCH":
+            if details:
+                for detail in details:
+                    if "offer_type" not in detail:
+                        raise serializers.ValidationError({
+                            "details": {"offer_type": ["Dieses Feld ist erforderlich."]}
+                        })
+
         return data
 
     def update(self, instance, validated_data):

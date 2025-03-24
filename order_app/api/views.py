@@ -66,7 +66,7 @@ class OrderDeleteView(DestroyAPIView):
     queryset = Order.objects.all()
     permission_classes = [IsAdminUser]
 class OrderCountView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
         try:
